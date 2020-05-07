@@ -7,13 +7,10 @@ import json
 import requests
 import random
 
-
-def setup(icon):
-    icon.visible = True
-    pass
+location = "Duque de Caxias"
 
 
-def create_image(temperatura):
+def create_image(temperatura: int) -> None:
     # Generate an image
     width = 40
     height = 25
@@ -28,32 +25,34 @@ def create_image(temperatura):
     pass
 
 
-def exit_action(icon):
-    icon.shutdown()
-
-
-def get_weather():
+def get_weather() -> int:
     key = "610f0cdf37062926c9536ed9f7621e23"
-    r = requests.get(
-        'http://api.openweathermap.org/data/2.5/weather?q=Duque+de+Caxias&APPID={}&units=metric'.format(key))
-    obj = r.json()
-    return int(obj['main']['temp'])
+    locationFormated = location.replace(" ", "+")
+    try:
+        r = requests.get(
+            'http://api.openweathermap.org/data/2.5/weather?q={}&APPID={}&units=metric'.format(locationFormated, key))
+        obj = r.json()
+        return int(obj['main']['temp'])
+    except:
+        return int("00")
 
 
-def create_icon():
-    create_image(get_weather())
-    menu_options = (("Exit", None, exit_action),)
-    systray = SysTrayIcon("temp.ico", "Example tray icon", menu_options)
+def create_icon() -> SysTrayIcon:
+    weather = get_weather()
+    create_image(weather)
+    systray = SysTrayIcon(
+        "temp.ico", "Temperatura em {}".format(location))
     return systray
 
 
-def main():
+def main() -> None:
     tray = create_icon()
     tray.start()
     while True:
         time.sleep(3600)
         create_image(get_weather())
         tray.update(icon="temp.ico")
+    tray.shutdown()
     pass
 
 
