@@ -6,6 +6,8 @@ import time
 import json
 import requests
 import random
+import os
+import signal
 
 location = "Duque de Caxias"
 
@@ -37,11 +39,16 @@ def get_weather() -> int:
         return int("00")
 
 
+def close_program(SysTrayIcon):
+    os.kill(os.getpid(), signal.CTRL_BREAK_EVENT)
+    pass
+
+
 def create_icon() -> SysTrayIcon:
-    weather = get_weather()
+    weather = get_weather()  # get_weather()
     create_image(weather)
     systray = SysTrayIcon(
-        "temp.ico", "Temperatura em {}".format(location))
+        "temp.ico", "Temperatura em {}".format(location), on_quit=close_program)
     return systray
 
 
@@ -50,9 +57,8 @@ def main() -> None:
     tray.start()
     while True:
         time.sleep(3600)
-        create_image(get_weather())
+        create_image(get_weather())  # get_weather()
         tray.update(icon="temp.ico")
-    tray.shutdown()
     pass
 
 
